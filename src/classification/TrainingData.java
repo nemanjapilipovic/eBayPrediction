@@ -62,7 +62,7 @@ public class TrainingData {
 		System.out.println(eval.toSummaryString());
 
 	}
-	
+/*	
 	public void naiveBayes() throws Exception {
 
 		Discretize discretizeFilter = new Discretize();
@@ -88,5 +88,5 @@ public class TrainingData {
 
 
 	}
-
+*/
 }

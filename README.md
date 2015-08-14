@@ -208,6 +208,7 @@ Kako bi se kreirao skup podataka koji će se koristiti za trening neophodno je d
 
 Primer prvog fajla:
 
+```
 @relation applelaptops 
 
 @attribute screenSize NUMERIC
@@ -223,9 +224,11 @@ Primer prvog fajla:
 13.3,2,250,240,269.99
 
 ...
+```
 
 Primer drugog fajla:
 
+```
 @relation applelaptops 
 
 @attribute productFamily {MacBookPro,MacBook,MacBookAir}
@@ -241,6 +244,7 @@ MacBookPro,13.3,MacOSX10.7-Lion,IntelCorei5,669.99
 MacBook,13.3,MacOSX10.6-SnowLeopard,IntelCore2Duo,269.99
 
 ...
+```
 
 I jedan i drugi fajl sačuvani su u folderu "data" u okviru samog projekta.
 
