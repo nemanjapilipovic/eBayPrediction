@@ -169,10 +169,10 @@ Sledi primer dela XML odgovora:
 		</NameValueList>  
 		…   
 	</ItemSpecifics>
-<Country>US</Country>
-<AutoPay>true</AutoPay>
-<QuantityAvailableHint>Limited</QuantityAvailableHint>
-<GlobalShipping>true</GlobalShipping>
+	<Country>US</Country>
+	<AutoPay>true</AutoPay>
+	<QuantityAvailableHint>Limited</QuantityAvailableHint>
+	<GlobalShipping>true</GlobalShipping>
 </Item> 
 …
 ```
