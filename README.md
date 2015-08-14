@@ -171,7 +171,8 @@ Sledi primer dela XML odgovora:
 	</ItemSpecifics>
 <Country>US</Country>
 <AutoPay>true</AutoPay>
-<QuantityAvailableHint>Limited</QuantityAvailableHint>    <GlobalShipping>true</GlobalShipping>
+<QuantityAvailableHint>Limited</QuantityAvailableHint>
+<GlobalShipping>true</GlobalShipping>
 </Item> 
 …
 ```
