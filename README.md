@@ -13,7 +13,7 @@ Tok izvršenja aplikacije se sastoji iz sledećih koraka:
 
 1.	Prikupljanje podataka o proizvodima
 
-2	Procesiranje prethodno prikupljenih podataka
+2.	Procesiranje prethodno prikupljenih podataka
 
 3.	Kreiranje skupa podataka za trening
 
