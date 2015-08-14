@@ -30,13 +30,75 @@ public final static String EBAY_FINDING_SERVICE_URI = "http://svcs.ebay.com/serv
 			+ "{applicationId}&GLOBAL-ID={globalId}&categoryId={categoryId}"
 			+ "&paginationInput.entriesPerPage={maxresults}";
 
-S obzirom da je potrebno da prikupimo podatke o proizvodima iz određene kategorije, parametar OPERATION-NAME je findItemsByCategory. Parametar SERVICE-VERSION je postavljan na 1.0.0 i predstavlja verziju API-ja koju ova aplikacija podržava. Kako bismo uopšte mogli da izvršimo upit putem eBay API-ja neophodno je da prethodno kreiramo aplikaciju na eBay sajtu koji je namenjen razvoju aplikacija što podrazumeva da smo dobili određene parametre koji će jedinstveno identifikovati upravo naše pozive API-ja. U našem slučaju to je parametar SECURITY-APPNAME koji postavljamo na određenu vrednost koju smo dobili prilikom registracije naše aplikacije. GLOBAL-ID je parametar koji predstavlja jedinstveni identifikator za kombinaciju sajta, jezika i teritorije. U našem slučaju EBAY-US podrazumeva da ćemo koristi eBay US sajt. CategoryId je postavljen na 111422 što predstavlja broj kategorije koja sadrži Apple laptopove. Više o tome kako se dobijaju brojevi kategorije možete pogledati na [GetCategoryInfo] (http://developer.ebay.com/devzone/shopping/docs/callref/GetCategoryInfo.html). I na kraju, paginationInput.entriesPerPage parametar predstavlja broj zapisa koji će biti vraćeni u jednom pozivu. 
+Kako  bismo uopšte mogli da izvršimo upit putem eBay API-ja neophodno je da prethodno kreiramo aplikaciju na eBay sajtu koji je namenjen razvoju aplikacija što podrazumeva da smo dobili određene parametre koji će jedinstveno identifikovati upravo naše pozive API-ja.
+
+ - OPERATION-NAME je findItemsByCategory, s obzirom da prikupljamo podatke o proizvodima iz određene kateogrije 
+ - SERVICE-VERSION je postavljen je na 1.0.0 i predstavlja verziju API-ja koju ova aplikacija podržava
+ - SECURITY-APPNAME postavljamo na određenu vrednost koju smo dobili prilikom registracije naše aplikacije
+ - GLOBAL-ID je parametar koji predstavlja jedinstveni identifikator za kombinaciju sajta, jezika i teritorije; u našem slučaju EBAY-US podrazumeva da ćemo koristi eBay US sajt
+ - CategoryId je postavljen na 111422 što predstavlja broj kategorije koja sadrži Apple laptopove
+ - paginationInput.entriesPerPage parametar predstavlja broj zapisa koji će biti vraćeni u jednom pozivu
+
+Više o tome kako se dobijaju brojevi kategorije možete pogledati na [GetCategoryInfo] (http://developer.ebay.com/devzone/shopping/docs/callref/GetCategoryInfo.html).  
 
 Postoji ograničenje koje se odnosi na prethodno pomenuti parametar i koje podrazumeva da je u jednom pozivu API-ja moguće dobiti podatke o najviše 100 proizvoda.
 
-Podrazumevani format u kojem eBay API vraća podatke je XML, tako da nije potrebno posebno naglasiti prilikom slanja zahteva da je ovo format u kojem želimo da dobijemo podatke. Kako u našem slučaju dobijamo podatke o 100 zapisa neophodno je da iteriramo kroz XML stablo i da prikupimo podatke o proizvodima koji su nam potrebni za dalju realizaciju naše aplikacije. To je isključivo parametar ItemID koji će nam kasnije poslužiti da dobijemo detaljnije podatke o proizvodu. Ovi podaci se čuvaju u polju tipa String.
+Podrazumevani format u kojem eBay API vraća podatke je XML, tako da nije potrebno posebno naglasiti prilikom slanja zahteva da je ovo format u kojem želimo da dobijemo podatke. Kako u našem slučaju dobijamo podatke o 100 zapisa neophodno je da iteriramo kroz XML stablo i da prikupimo podatke o proizvodima koji su nam potrebni za dalju realizaciju naše aplikacije. To je isključivo parametar ItemID koji će nam kasnije poslužiti da dobijemo detaljnije podatke o proizvodu.
 
-Kako bismo dobili detaljnije informacije, o proizvodima, na osnovu kojih ćemo kreirati naše dataset-ove neophodno je izvršiti poziv ka [eBay Shopping API-ju] (http://developer.ebay.com/devzone/shopping/docs/CallRef/index.html). Ovde ćemo iskoristiti podatke o ItemID-jevima proizvoda koje smo sačuvali u String-u kada smo vršili poziv eBay Finding API-ja. S obzirom da smo u tom pozivu dobili podatke o 100 proizvoda, sada ćemo izvršiti 100 poziva ka eBay Shopping API-ju. U ovom slučaju link kojim se vrši poziv eBay Shopping API-ja u našem programu je prikazan sledećim Stringom:
+Sledi kratak primer dela XML odgovora:
+
+...
+<item>
+	<itemId>131324038642</itemId>
+	<title>Apple MacBook Pro Core i5 2.5GHz 4GB 500GB 13.3" MD101LL/A </title>
+	<globalId>EBAY-US</globalId>
+	<subtitle>Apple Certified Macbook Pro - Warranty - Free Shipping</subtitle>
+	<primaryCategory>
+		<categoryId>111422</categoryId>
+		<categoryName>Apple Laptops</categoryName>
+	</primaryCategory>
+	…
+	<productId type="ReferenceID">115174685</productId>
+	<paymentMethod>PayPal</paymentMethod>
+	<autoPay>true</autoPay>
+	<postalCode>29681</postalCode>
+	<location>Simpsonville,SC,USA</location>
+	<country>US</country>
+	<shippingInfo>
+		<shippingServiceCost currencyId="USD">0.0</shippingServiceCost>
+		<shippingType>FlatDomesticCalculatedInternational</shippingType>
+		<shipToLocations>US</shipToLocations>
+		…
+		<shipToLocations>FR</shipToLocations>
+		<expeditedShipping>true</expeditedShipping>
+		<oneDayShippingAvailable>true</oneDayShippingAvailable>
+		<handlingTime>1</handlingTime>
+	</shippingInfo>
+	<sellingStatus>
+		<currentPrice currencyId="USD">669.99</currentPrice>
+		<convertedCurrentPrice currencyId="USD">669.99</convertedCurrentPrice>
+		<sellingState>Active</sellingState>
+		<timeLeft>P28DT7H47M9S</timeLeft>
+	</sellingStatus>
+	<listingInfo>
+		<bestOfferEnabled>false</bestOfferEnabled>
+		<buyItNowAvailable>false</buyItNowAvailable>
+		<startTime>2014-10-17T00:59:11.000Z</startTime>
+		<endTime>2015-09-12T01:04:11.000Z</endTime>
+		<listingType>StoreInventory</listingType>
+		<gift>false</gift>
+	</listingInfo>
+	<returnsAccepted>true</returnsAccepted>
+	<condition>
+		<conditionId>2000</conditionId>
+		<conditionDisplayName>Manufacturer refurbished</conditionDisplayName>
+		</condition>
+	<isMultiVariationListing>false</isMultiVariationListing>
+	<topRatedListing>false</topRatedListing>
+</item>
+...
+
+Kako bismo dobili detaljnije informacije, o proizvodima, na osnovu kojih ćemo kreirati naše dataset-ove neophodno je izvršiti poziv ka [eBay Shopping API-ju] (http://developer.ebay.com/devzone/shopping/docs/CallRef/index.html). Ovde ćemo iskoristiti podatke o ItemID-jevima proizvoda koje smo prikupili prilikom poziva eBay Finding API-ja. S obzirom da smo u tom pozivu dobili podatke o 100 proizvoda, sada ćemo izvršiti 100 poziva ka eBay Shopping API-ju. U ovom slučaju link kojim se vrši poziv eBay Shopping API-ja u našem programu je prikazan sledećim Stringom:
 
 public final static String EBAY_FINDING_SERVICE_URI = "http://open.api.ebay.com/Shopping?callname="
 			+ "{callname}&appid={appid}"
@@ -45,16 +107,77 @@ public final static String EBAY_FINDING_SERVICE_URI = "http://open.api.ebay.com/
 			+ "&ItemID={itemid}"
 			+ "&IncludeSelector=Description,ItemSpecifics";
 
-Vrednost paramatra callname u ovom slučaju je GetSingleItem. Ovaj poziv omogućiće nam da dobijemo detaljnije podatke o proizvodima. Parametar appid je isti kao i u prethodnom slučaju. Verzija API-ja koju naša aplikacija podržava opisana je parametrom version. Vrednost siteid-ja je 0 što predstavlja identifikator US sajta. ItemID je vrednost koja će biti promenjena u svih 100 poziva API-ju kako bi se dobili podaci o 100 različitih proizvoda. IncludeSelector=Description, ItemSpecifics podrazumeva da želimo da u odgovoru dobijemo najdetaljnije podatke o opisu proizvoda.
+ - callname, u ovom slučaju je, GetSingleItem; ovaj poziv omogućiće nam da dobijemo detaljnije podatke o proizvodima
+ - appid je isti kao i u prethodnom slučaju
+ - version predstavlja verziju API-ja koju naša aplikacija podržava
+ - siteid je 0 što predstavlja identifikator US sajta
+ - ItemID je vrednost koja će biti promenjena u svih 100 poziva API-ju kako bi se dobili podaci o 100 različitih proizvoda
+ - IncludeSelector=Description, ItemSpecifics podrazumeva da želimo da u odgovoru dobijemo najdetaljnije podatke o opisu proizvoda
 
-Kao i u prethodnom slučaju, podrazumevani format u kojem API vraća podatke je XML. Neophodno je proći kroz XML stablo i izvući sve podatke koji su neophodni za kreiranje dataset-a. Ovi podaci su sačuvani, takođe, u polju koje je tipa String.
+Kao i u prethodnom slučaju, podrazumevani format u kojem API vraća podatke je XML. Neophodno je proći kroz XML stablo i izvući sve podatke koji su neophodni za kreiranje dataset-a.
+
+Sledi primer dela XML odgovora:
+
+…
+<Item>
+	<Description> … </Description>
+	<ItemID>111742104303</ItemID>
+	<EndTime>2015-09-12T15:00:03.000Z</EndTime>
+	<ViewItemURLForNaturalSearch>…</ViewItemURLForNaturalSearch>
+	<ListingType>FixedPriceItem</ListingType>
+	<Location>Jamaica, New York</Location>
+	<GalleryURL>…</GalleryURL>    <PictureURL>…</PictureURL>
+	<PrimaryCategoryID>111422</PrimaryCategoryID>
+	<PrimaryCategoryName>Computers/Tablets &amp; Networking:Laptops &amp; Netbooks:Apple Laptops</PrimaryCategoryName
+	<BidCount>0</BidCount>
+	<ConvertedCurrentPrice currencyID="USD">1099.99</ConvertedCurrentPrice>
+	<ListingStatus>Active</ListingStatus>
+	<TimeLeft>P28DT21H29M55S</TimeLeft>
+	<Title>Apple MacBook Pro MF839LL/A 13.3-Inch Laptop with Retina Display (128 GB) Newest</Title>
+	<ItemSpecifics>
+		…
+		<NameValueList
+			<Name>Brand</Name>
+			<Value>Apple</Value>
+		</NameValueList>
+		<NameValueList>
+			<Name>Product Family</Name>
+			<Value>MacBook Pro</Value>
+		</NameValueList>
+		<NameValueList>
+			<Name>Screen Size</Name>
+			<Value>13.3&quot;</Value>
+		</NameValueList>
+		<NameValueList>
+			<Name>Processor Type</Name>
+			<Value>Intel Core i5</Value>
+		</NameValueList>
+		<NameValueList>
+			<Name>Processor Speed</Name>
+			<Value>2.70GHz</Value>
+		</NameValueList>
+		<NameValueList>
+			<Name>Memory</Name>
+			<Value>8GB</Value>
+		</NameValueList>
+		<NameValueList>
+			<Name>Hard Drive Capacity</Name>
+			<Value>128 GB</Value>
+		</NameValueList>  
+		…   
+	</ItemSpecifics>
+<Country>US</Country>
+<AutoPay>true</AutoPay>
+<QuantityAvailableHint>Limited</QuantityAvailableHint>    <GlobalShipping>true</GlobalShipping>
+</Item> 
+…
 
 
 ####Procesiranje prethodno prikupljenih podataka
 
 Samo procesiranje prethodno prikupljenih podataka vrši se u momentu kada se prolazi kroz XML stablo odgovora eBay API-ja.
 
-Prilikom poziva eBay Finding API-ju nije potrebno da se podatak o ItemID-ju menja, već se samo smešta u odgovarajući String.
+Prilikom poziva eBay Finding API-ju nije potrebno da se podatak o ItemID-ju menja, jer je u formatu koji nam je i potreban.
 
 U slučaju poziva eBay Shopping API-ja, podaci koje dobijamo nisu u formatu koji nam je pogodan za kreiranje dataset-a pa ih je neophodno prilagoditi našim potrebama. U slučaju nominalnih podataka koji se odnose na vrednosti parametara Product Family, Processor Type i Operating System potrebno je izbaciti prazna mesta što se vrši pozivom metode:
 
@@ -76,7 +199,7 @@ replaceAll("\\D+", "");
 ###Kreiranje skupa podataka za trening
 
 
-Kako bismo kreirali skup podataka koji ćemo koristiti za trening neophodno je da pozovemo metodu koja će nam vratiti string koji će sadržati podatke o 100 proizvoda koje smo prikupili (opisano u prethodnom poglavlju). Odgovarajućom obradom ovih podataka kreiraćemo dva [arff fajla] (http://www.cs.waikato.ac.nz/ml/weka/arff.html). Prvi arff fajl sastoji se od nominalnih podataka porodica proizvoda, veličina ekrana, operativni sistem i tip procesora, kao i cene koja je numerička, dok se drugi arff fajl sastoji od isključivo numeričkih podataka o veličini ekrana, memoriji, kapacitetu hard diska, brzini procesora i ceni.
+Kako bismo kreirali skup podataka koji ćemo koristiti za trening neophodno je da pozovemo metodu koja će nam vratiti podatke o 100 proizvoda koje smo prikupili (opisano u prethodnom poglavlju). Odgovarajućom obradom ovih podataka kreiraćemo dva [arff fajla] (http://www.cs.waikato.ac.nz/ml/weka/arff.html). Prvi arff fajl sastoji se od nominalnih podataka porodica proizvoda, veličina ekrana, operativni sistem i tip procesora, kao i cene koja je numerička, dok se drugi arff fajl sastoji od isključivo numeričkih podataka o veličini ekrana, memoriji, kapacitetu hard diska, brzini procesora i ceni.
 
 Primer prvog fajla:
 
@@ -123,9 +246,9 @@ I jedan i drugi fajl sačuvani su u folderu "data" u okviru samog projekta.
 Korišćena su tri klasifikatora i to **k-Nearest-Neighbours**, **SupportVectorMachines** i **REPTree**. Trening klasifikatora se vrši nad oba dataset-a kreirana u prethodnom koraku i za sva tri klasifikatora. Nakon uspešno izvršenog treninga klasifikator treba da bude u stanju da što približnije predvidi cenu proizvoda na osnovu unetog seta parametara.
 
 
-##Tehnička analiza
+##Tehnička realizacija
 
-Sledi opis biblioteka koje su korišćene u realizaciji samog projekta. Kod je realizovan u programskom jeziku **Java** korišćenjem razvojnog okruženja **Eclipse**. Referencirane biblioteke koje su korišćene u ovom projektu su **Weka** i **LibSVM**. 
+Sledi opis biblioteka koje su korišćene u realizaciji samog projekta. Kod je realizovan u programskom jeziku **Java**. Referencirane biblioteke koje su korišćene u ovom projektu su **Weka** i **LibSVM**. 
 
 
 ###Weka
@@ -145,26 +268,16 @@ Nakon izvršenog treninga moguće je pozvati klasifikator da predvidi cenu proiz
 
 ##Analiza
 
-Slede tabele u kojima su dati podaci o koeficijentu korelacije i srednjoj apsolutnoj greški za sva tri klasifikatora, kao i za oba dataseta.
-
-Tabela za numerički dataset:
+Sledi tabela u kojima su dati podaci o koeficijentu korelacije i srednjoj apsolutnoj greški za sva tri klasifikatora.
 
 |Klasifikator|Koeficijent korelacije|Srednja apsolutna greška|
 |------------|----------------------|------------------------|
-|kNearestNeighbours|0,8773|163,2821|
-|Support Vector Machine|0,0299|433,4532|
-|REPTree|0,8447|209,858|
+|kNearestNeighbours|0,8691|137,9989|
+|Support Vector Machine|0,0941|334,6157|
+|REPTree|0,8466|170,5975|
 
-Tabela za nominalni dataset:
+Kako bismo ocenili određeni klasifikator i uporedili ga sa nekim drugim klasifikatorom potrebno je da apsolutna vrednost koeficijenta korelacije bude što veća, odnosno da srednja apsolutna greška bude što manja. Generalno, koeficijent korelacije ocenjuje "jačinu" statističke veze između dve ili više promenljivih. S druge strane, srednja apsolutna greška je vrednost koja se koristi kako bi se izmerilo koliko su predviđanja približna mogućim ishodima.
 
-|Klasifikator|Koeficijent korelacije|Srednja apsolutna greška|
-|------------|----------------------|------------------------|
-|kNearestNeighbours|0,8998|105,0033|
-|Support Vector Machine|0,367|407,198|
-|REPTree|0,8675|278,4448|
-
-Kada su u pitanju oba dataset kako bismo ocenili određeni klasifikator i uporedili ga sa nekim drugim klasifikatorom potrebno je da apsolutna vrednost koeficijenta korelacije bude što veća, odnosno da srednja apsolutna greška bude što manja. Generalno, koeficijent korelacije ocenjuje "jačinu" statističke veze između dve ili više promenljivih. S druge strane, srednja apsolutna greška je vrednost koja se koristi kako bi se izmerilo koliko su predviđanja približna mogućim ishodima.
-
-Na oba dataset-a je primetno da su vrednosti koeficijenta korelacije dosta male, odnosno da su vrednosti srednje apsolutne greške dosta velike kada se koristi Support Vector Machine klasifikator. Što se tiče koeficijenta korelacije kod klasifikatora kNearestNeighbours i REPTree - oni imaju približne vrednosti, dok su srednje apsolutne greške ipak značajno manje kod klasifikatora kNearestNeighbours.
+Primetno je da je vrednost koeficijenta korelacije dosta mala, odnosno da je vrednost srednje apsolutne greške dosta velika kada se koristi Support Vector Machine klasifikator. Što se tiče koeficijenta korelacije kod klasifikatora kNearestNeighbours i REPTree - oni imaju približne vrednosti, dok je srednja apsolutna greška ipak značajno manja kod klasifikatora kNearestNeighbours.
 
 U skladu sa podacima koje smo dobili možemo da zaključimo da je najbolje koristiti klasifikator kNearestNeighbours, uz napomenu da i REPTree klasifikator ima dosta dobre performanse.
