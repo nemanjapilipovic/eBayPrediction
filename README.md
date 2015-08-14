@@ -25,10 +25,12 @@ Tok izvršenja aplikacije se sastoji iz sledećih koraka:
 
 Za prikupljanje podataka o proizvodima iz kategorije "Apple Laptops" korišćen je [eBay Finding API] (http://developer.ebay.com/devzone/finding/concepts/findingapiguide.html). Ovde se, pre svega, misli na prikupljanje ID-ja proizvoda kako bi se kasnije moglo dobiti više detalja vezanih za sam proizvod. Link koji služi za poziv API-ja je u programu predstavljen sledećim stringom:
 
+```
 public final static String EBAY_FINDING_SERVICE_URI = "http://svcs.ebay.com/services/search/FindingService/v1?OPERATION-NAME="
 			+ "{operation}&SERVICE-VERSION={version}&SECURITY-APPNAME="
 			+ "{applicationId}&GLOBAL-ID={globalId}&categoryId={categoryId}"
 			+ "&paginationInput.entriesPerPage={maxresults}";
+```
 
 Kako bi uopšte mogao da se izvrši upit putem eBay API-ja neophodno je da se prethodno kreira aplikacija na eBay sajtu koji je namenjen razvoju aplikacija što podrazumeva da dobijanje određenih parametara koji će jedinstveno identifikovati pozive API-ja.
 
@@ -102,12 +104,14 @@ Sledi kratak primer dela XML odgovora:
 
 U cilju dobijanja detaljnijih informacija, o proizvodima, na osnovu kojih će se kreirati dataset neophodno je izvršiti poziv ka [eBay Shopping API-ju] (http://developer.ebay.com/devzone/shopping/docs/CallRef/index.html). Ovde će se iskoristiti podaci o ItemID-jevima proizvoda koji su prikupljeni prilikom poziva eBay Finding API-ja. S obzirom da se u tom pozivu dobijaju podaci o 100 proizvoda, potrebno je izvršiti 100 poziva ka eBay Shopping API-ju. U ovom slučaju link kojim se vrši poziv eBay Shopping API-ja je u programu prikazan sledećim Stringom:
 
+```
 public final static String EBAY_FINDING_SERVICE_URI = "http://open.api.ebay.com/Shopping?callname="
 			+ "{callname}&appid={appid}"
 			+ "&version={version}"
 			+ "&siteid={siteid}"
 			+ "&ItemID={itemid}"
 			+ "&IncludeSelector=Description,ItemSpecifics";
+```
 
  - callname, u ovom slučaju je, GetSingleItem; ovaj poziv omogućava dobijanje detaljnijih podataka o proizvodima
  - appid je isti kao i u prethodnom slučaju
