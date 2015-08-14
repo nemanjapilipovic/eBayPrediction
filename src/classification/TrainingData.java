@@ -4,12 +4,15 @@ import java.util.Random;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.functions.LibSVM;
 import weka.classifiers.lazy.IBk;
+import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.REPTree;
 import weka.core.Instances;
 import weka.core.SelectedTag;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.unsupervised.attribute.Discretize;
 
 public class TrainingData {
 	Instances data;
@@ -57,6 +60,32 @@ public class TrainingData {
 		Evaluation eval = new Evaluation(data);
 		eval.crossValidateModel(svm, data, 10, new Random(1));
 		System.out.println(eval.toSummaryString());
+
+	}
+	
+	public void naiveBayes() throws Exception {
+
+		Discretize discretizeFilter = new Discretize();
+		discretizeFilter.setAttributeIndices("4,5,6,7,8");
+		discretizeFilter.setInputFormat(data);
+		discretizeFilter.setBins(10);
+		// podela se vrsi tako da svaki interval ima priblizno jednak broj instanci
+		discretizeFilter.setUseEqualFrequency(true);
+		
+		NaiveBayes nbClassifier = new NaiveBayes();
+		FilteredClassifier filteredClassifier = new FilteredClassifier();
+		filteredClassifier.setClassifier(nbClassifier);
+		filteredClassifier.setFilter( discretizeFilter );
+		filteredClassifier.buildClassifier(data);
+		
+		Evaluation eval = new Evaluation(data);
+		// klasifikator se evaluaira kroz kros-validaciju sa 10 iteracija (10-fold cross-validation)
+		eval.crossValidateModel(filteredClassifier, data, 10, new Random(1));
+		//prikazujemo rezultate evaluacije klasifikatora
+		System.out.println(eval.toSummaryString()); 
+		System.out.println(eval.toClassDetailsString());
+		System.out.println(eval.toMatrixString());
+
 
 	}
 

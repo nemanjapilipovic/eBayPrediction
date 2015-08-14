@@ -11,10 +11,12 @@ public class Main {
 		
 		TrainingData td = new TrainingData();
 		td.loadData();
-		
+		/*
 		td.kNearestNeighbours();
 		td.repTree();
 		td.supportVectorMachine();
+		*/
+		td.naiveBayes();
 		
 
 	}
