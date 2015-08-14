@@ -210,47 +210,29 @@ replaceAll("\\D+", "");
 
 Kako bi se kreirao skup podataka koji će se koristiti za trening neophodno je da se pozove metoda koja će vratiti podatke o 100 proizvoda koji su prikupiljeni (opisano u prethodnom poglavlju). Odgovarajućom obradom ovih podataka kreira se jedan [arff fajl] (http://www.cs.waikato.ac.nz/ml/weka/arff.html). Ovaj arff fajl sastoji se od nominalnih podataka porodica proizvoda, operativni sistem i tip procesora, kao i numeričkih podataka o veličini ekrana, memoriji, kapacitetu hard diska, brzini procesora i ceni.
 
-Primer prvog fajla:
+Primer arff fajla:
 
 ```
 @relation applelaptops 
 
+@attribute productFamily {MacBookPro,MacBook,MacBookAir,MacBookProwithRetinadisplay}
+@attribute operatingSystem {MacOSX10.10-Yosemite,MacOSX10.7-Lion,MacOSX10.6-SnowLeopard,MacOSX10,10.10,AppleMacOSX10.7,MacOSX,MacOSX10.9-Mavericks,MacOSX10.8-MountainLion,AppleMacOSX10.5,MacOSX10.5-Leopard,AppleMacOSX10.10-Yosemite,MacOSXYosemite,AllCurrentOS10.10.4oraskIcanloadolderOS,AppleMacOS,MacOSX10.9}
+@attribute processorType {IntelCorei52ndGen.,IntelCorei5,IntelCore2Duo,IntelCorei54thGen.,Intel,IntelCorei72ndGen.,Corei7,Quad-coreIntelCorei7,IntelCorei74thGen.,IntelCorei75thGen.,I7,IntelCorei55thGen.,IntelCorei7,IntelCorei71stGen.,IntelQuadCorei7,IntelCorei73rdGen.,IntelDualCore}
 @attribute screenSize NUMERIC
 @attribute memory NUMERIC
 @attribute hardDriveCapacity NUMERIC
 @attribute processorSpeed NUMERIC
-@attribute price NUMERIC
-
-@data
-
-13.3,4,500,250,669.99
-
-13.3,2,250,240,269.99
-
-...
-```
-
-Primer drugog fajla:
-
-```
-@relation applelaptops 
-
-@attribute productFamily {MacBookPro,MacBook,MacBookAir}
-@attribute screenSize {13.3,11.6,15.4,13,17}
-@attribute operatingSystem {MacOSX10.7-Lion,MacOSX10.6-SnowLeopard,MacOSX10,MacOSX,MacOSX10.10-Yosemite,YOSEMITE,MacOSX10.5-Leopard,AppleMacOS,MacOSXYosemite,MacOS,OSXMavericks,MacOSX10.9-Mavericks}
-@attribute processorType {IntelCorei5,IntelCore2Duo,IntelCorei52ndGen.,IntelCorei75thGen.,Quad-coreIntelCorei7,IntelDualCore,IntelCorei53rdGen.,Intel,IntelCorei73rdGen.,IntelCorei74thGen.,IntelCorei7,IntelCorei55thGen.,IntelCorei72ndGen.,IntelQuad-Corei7,IntelCorei71stGen.}
 @attribute productPrice NUMERIC
 
 @data
 
-MacBookPro,13.3,MacOSX10.7-Lion,IntelCorei5,669.99
+MacBookPro,MacOSX10.10-Yosemite,IntelCorei52ndGen.,13,4,320,230,380.0
 
-MacBook,13.3,MacOSX10.6-SnowLeopard,IntelCore2Duo,269.99
-
+MacBookPro,MacOSX10.7-Lion,IntelCorei5,13.3,4,500,250,669.99
 ...
 ```
 
-I jedan i drugi fajl sačuvani su u folderu "data" u okviru samog projekta.
+Ovaj arff fajl sačuvan je u folderu "data" u okviru samog projekta.
 
 
 ###Primena metoda mašinskog učenja
