@@ -47,7 +47,7 @@ Podrazumevani format u kojem eBay API vraća podatke je XML, tako da nije potreb
 
 Sledi kratak primer dela XML odgovora:
 
-'''
+```
 ...
 <item>
 	<itemId>131324038642</itemId>
@@ -98,7 +98,7 @@ Sledi kratak primer dela XML odgovora:
 	<topRatedListing>false</topRatedListing>
 </item>
 ...
-'''
+```
 
 U cilju dobijanja detaljnijih informacija, o proizvodima, na osnovu kojih će se kreirati dataset neophodno je izvršiti poziv ka [eBay Shopping API-ju] (http://developer.ebay.com/devzone/shopping/docs/CallRef/index.html). Ovde će se iskoristiti podaci o ItemID-jevima proizvoda koji su prikupljeni prilikom poziva eBay Finding API-ja. S obzirom da se u tom pozivu dobijaju podaci o 100 proizvoda, potrebno je izvršiti 100 poziva ka eBay Shopping API-ju. U ovom slučaju link kojim se vrši poziv eBay Shopping API-ja je u programu prikazan sledećim Stringom:
 
@@ -120,7 +120,7 @@ Kao i u prethodnom slučaju, podrazumevani format u kojem API vraća podatke je 
 
 Sledi primer dela XML odgovora:
 
-'''
+```
 …
 <Item>
 	<Description> … </Description>
@@ -174,7 +174,7 @@ Sledi primer dela XML odgovora:
 <QuantityAvailableHint>Limited</QuantityAvailableHint>    <GlobalShipping>true</GlobalShipping>
 </Item> 
 …
-'''
+```
 
 
 ####Procesiranje prethodno prikupljenih podataka
