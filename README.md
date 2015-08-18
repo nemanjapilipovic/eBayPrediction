@@ -4,8 +4,7 @@
 
 [eBay] (https://ebay.com/) je online aukcijski sajt i jedan od najpopularnijih sajtova na Internetu. Ima više miliona ponuda i više miliona korisnika koji se nadmeću i postavljaju (određuju) cene proizvoda. eBay, takođe, ima i besplatan XML-zasnovan [API] (https://go.developer.ebay.com/what-ebay-api) koji je moguće koristiti kako bi se izvršile razne pretrage, kako bi se dobili detaljni podaci o nekom proizvodu ili kako bi se neki proizvod postavio na sajt.
 
-Osnovna ideja ovog projekta je kreiranje aplikacija koja će na osnovu prikupljenih podataka o proizvodima iz kategorije "Apple Laptops", moći da predvidi cenu proizvoda na osnovu unete grupe podataka o proizvodu od strane korisnika.
-Za trening aplikacije koriste se tri klasifikatora, a to su: k-Nearest-Neighbours, REPTree i Support Vector Machine (SVM).
+Osnovna ideja ovog projekta je kreiranje aplikacije koja će na osnovu prikupljenih podataka o proizvodima iz kategorije "Apple Laptops" predviđati cenu proizvoda na osnovu podataka o proizvodu. Za trening aplikacije koriste se tri klasifikatora, a to su: k-Nearest-Neighbours, REPTree i Support Vector Machine (SVM). U sekciji Analiza date su performanse svih testiranih klasifikatora i zaključci o njihovim performansama.
 
 ##Rešenje
 
@@ -13,17 +12,14 @@ Tok izvršenja aplikacije se sastoji iz sledećih koraka:
 
 1.	Prikupljanje podataka o proizvodima
 
-2.	Procesiranje prethodno prikupljenih podataka
+2.	Procesiranje prikupljenih podataka i kreiranje skupa podataka za trening
 
-3.	Kreiranje skupa podataka za trening
-
-4.	Primena metoda mašinskog učenja
+3.	Testiranje performansi klasifikatora
 
 
 ###Prikupljanje podataka o proizvodima
 
-
-Za prikupljanje podataka o proizvodima iz kategorije "Apple Laptops" korišćen je [eBay Finding API] (http://developer.ebay.com/devzone/finding/concepts/findingapiguide.html). Ovde se, pre svega, misli na prikupljanje ID-ja proizvoda kako bi se kasnije moglo dobiti više detalja vezanih za sam proizvod. Link koji služi za poziv API-ja je u programu predstavljen sledećim stringom:
+Za prikupljanje podataka o proizvodima iz kategorije "Apple Laptops" korišćen je [eBay Finding API] (http://developer.ebay.com/devzone/finding/concepts/findingapiguide.html). Ovaj servis pruža, pre svega, ID-jeve proizvoda koji će se kasnije koristiti za dobijanje više detalja o samom proizvodu. Link koji se koristi za poziv API-ja je u programu predstavljen sledećim stringom:
 
 ```
 public final static String EBAY_FINDING_SERVICE_URI = "http://svcs.ebay.com/services/search/FindingService/v1?OPERATION-NAME="
@@ -32,22 +28,20 @@ public final static String EBAY_FINDING_SERVICE_URI = "http://svcs.ebay.com/serv
 			+ "&paginationInput.entriesPerPage={maxresults}";
 ```
 
-Kako bi uopšte mogao da se izvrši upit putem eBay API-ja neophodno je da se prethodno kreira aplikacija na eBay sajtu koji je namenjen razvoju aplikacija što podrazumeva da dobijanje određenih parametara koji će jedinstveno identifikovati pozive API-ja.
-
- - OPERATION-NAME je findItemsByCategory, s obzirom da se prikupljaju podaci o proizvodima iz određene kateogrije 
- - SERVICE-VERSION je postavljen je na 1.0.0 i predstavlja verziju API-ja koju ova aplikacija podržava
+ - OPERATION-NAME je *findItemsByCategory* s obzirom da se prikupljaju podaci o proizvodima iz određene kateogrije 
+ - SERVICE-VERSION je postavljen je na *1.0.0* i predstavlja verziju API-ja koju ova aplikacija podržava
  - SECURITY-APPNAME se postavlja na određenu vrednost koju se dobija prilikom registracije aplikacije
  - GLOBAL-ID je parametar koji predstavlja jedinstveni identifikator za kombinaciju sajta, jezika i teritorije; u ovom slučaju EBAY-US podrazumeva da će se koristiti eBay US sajt
- - CategoryId je postavljen na 111422 što predstavlja broj kategorije koja sadrži Apple laptopove
- - paginationInput.entriesPerPage parametar predstavlja broj zapisa koji će biti vraćeni u jednom pozivu
+ - CategoryId je postavljen na *111422* što predstavlja broj kategorije koja sadrži Apple laptopove
+ - paginationInput.entriesPerPage parametar predstavlja broj rezultata koji će biti vraćeni u jednom pozivu. Postoji ograničenje koje se odnosi na ovaj parametar i podrazumeva da je u jednom pozivu API-ja moguće dobiti podatke o najviše 100 proizvoda
+ 
+Kako bi se uopšte mogao izvršiti upit putem eBay API-ja, neophodno je prethodno registrovati aplikaciju na eBay sajtu koji je namenjen develoeprima. Kao rezultat registrovanja aplikacije na eBay sajtu, dobijaju se parametri koji se koriste prilikom poziva API-ja.
 
-Više o tome kako se dobijaju brojevi kategorije možete pogledati na [GetCategoryInfo] (http://developer.ebay.com/devzone/shopping/docs/callref/GetCategoryInfo.html).  
+Više o tome kako se dobijaju brojevi kategorije može se pogledati na [GetCategoryInfo] (http://developer.ebay.com/devzone/shopping/docs/callref/GetCategoryInfo.html).  
 
-Postoji ograničenje koje se odnosi na prethodno pomenuti parametar i koje podrazumeva da je u jednom pozivu API-ja moguće dobiti podatke o najviše 100 proizvoda.
+Podrazumevani format u kojem eBay API vraća podatke je XML, tako da nije potrebno posebno naglasiti prilikom slanja zahteva da je ovo format u kojem će podaci biti vraćeni. Kako se u navedenom slučaju dobijaju podaci o 100 zapisa, neophodno je iterirati kroz XML stablo i prikupiti podatke o proizvodima koji su potrebni za dalju realizaciju aplikacije. To je isključivo parametar *ItemID* koji će kasnije poslužiti da se dobiju detaljniji podaci o proizvodu.
 
-Podrazumevani format u kojem eBay API vraća podatke je XML, tako da nije potrebno posebno naglasiti prilikom slanja zahteva da je ovo format u kojem će podaci biti vraćeni. Kako se u navedenom slučaju dobijaju podaci o 100 zapisa neophodno je iterirati kroz XML stablo i prikupiti podatke o proizvodima koji su potrebni za dalju realizaciju aplikacije. To je isključivo parametar ItemID koji će kasnije poslužiti da se dobiju detaljniji podaci o proizvodu.
-
-Sledi kratak primer dela XML odgovora:
+Sledi primer dela XML odgovora:
 
 ```
 ...
@@ -102,7 +96,7 @@ Sledi kratak primer dela XML odgovora:
 ...
 ```
 
-U cilju dobijanja detaljnijih informacija, o proizvodima, na osnovu kojih će se kreirati dataset neophodno je izvršiti poziv ka [eBay Shopping API-ju] (http://developer.ebay.com/devzone/shopping/docs/CallRef/index.html). Ovde će se iskoristiti podaci o ItemID-jevima proizvoda koji su prikupljeni prilikom poziva eBay Finding API-ja. S obzirom da se u tom pozivu dobijaju podaci o 100 proizvoda, potrebno je izvršiti 100 poziva ka eBay Shopping API-ju. U ovom slučaju link kojim se vrši poziv eBay Shopping API-ja je u programu prikazan sledećim Stringom:
+U cilju dobijanja detaljnijih informacija o proizvodima, na osnovu kojih će se kreirati dataset, neophodno je izvršiti poziv ka [eBay Shopping API-ju] (http://developer.ebay.com/devzone/shopping/docs/CallRef/index.html). Ovde će se iskoristiti podaci o ItemID-jevima proizvoda koji su prikupljeni prilikom poziva eBay Finding API-ja. S obzirom da se u tom pozivu dobijaju podaci o 100 proizvoda, potrebno je izvršiti 100 poziva ka eBay Shopping API-ju. U ovom slučaju link kojim se vrši poziv eBay Shopping API-ja je u programu prikazan sledećim stringom:
 
 ```
 public final static String EBAY_FINDING_SERVICE_URI = "http://open.api.ebay.com/Shopping?callname="
@@ -113,10 +107,10 @@ public final static String EBAY_FINDING_SERVICE_URI = "http://open.api.ebay.com/
 			+ "&IncludeSelector=Description,ItemSpecifics";
 ```
 
- - callname, u ovom slučaju je, GetSingleItem; ovaj poziv omogućava dobijanje detaljnijih podataka o proizvodima
- - appid je isti kao i u prethodnom slučaju
+ - callname, u ovom slučaju je *GetSingleItem*. Ovaj poziv omogućava dobijanje detaljnijih podataka o proizvodima
+ - appid je isti kao i u prethodnom primeru
  - version predstavlja verziju API-ja koju aplikacija podržava
- - siteid je 0 što predstavlja identifikator US sajta
+ - siteid je *0* što predstavlja identifikator US sajta
  - ItemID je vrednost koja će biti promenjena u svih 100 poziva API-ju kako bi se dobili podaci o 100 različitih proizvoda
  - IncludeSelector=Description, ItemSpecifics podrazumeva da je potebno u odgovoru dobiti najdetaljnije podatke o opisu proizvoda
 
@@ -181,34 +175,29 @@ Sledi primer dela XML odgovora:
 …
 ```
 
-
-####Procesiranje prethodno prikupljenih podataka
+####Procesiranje prikupljenih podataka i kreiranje skupa podataka za trening
 
 Samo procesiranje prethodno prikupljenih podataka vrši se u momentu kada se prolazi kroz XML stablo odgovora eBay API-ja.
 
-Prilikom poziva eBay Finding API-ju nije potrebno da se podatak o ItemID-ju menja, jer je u formatu koji nam je i potreban.
+Prilikom poziva eBay Finding API-ju nije potrebno da se podatak o ItemID-ju menja, jer je u formatu koji je i potreban.
 
 U slučaju poziva eBay Shopping API-ja, podaci koji se dobijaju nisu u formatu koji je pogodan za kreiranje dataset-a pa ih je neophodno prilagoditi. U slučaju nominalnih podataka koji se odnose na vrednosti parametara Product Family, Processor Type i Operating System potrebno je izbaciti prazna mesta što se vrši pozivom metode:
 
 replace(" ", ""); 
 
-nad pomenutim stringovima. Podatku ScreenSize je takođe nephodno izbaciti znak koji označava inče (") kako bi ovaj podatak mogao imati numeričko tumačenje i ovo se realizuje pozivom metode:
+nad pomenutim stringovima. Podatku *ScreenSize* je takođe nephodno izbaciti znak koji označava inče (") kako bi ovaj podatak mogao imati numeričko tumačenje i ovo se realizuje pozivom metode:
 
 replace("\"", "");
 
-Nominalnom parametru Operating System se vrši zamena svih znakova zapeta sa srednjom crtom pozivom metode:
+Nominalnom parametru *Operating System* se vrši zamena svih znakova zapeta sa srednjom crtom pozivom metode:
 
 replace(",", "-");
 
-Kod numeričkih parametara Memory, Hard Drive Capacity i Processor Speed neophodno je sačuvati samo deo koji se odnosi na brojeve što se vrši pozivom sledeće metode koja kao parametar prima regularni izraz koji izbacuje sve što nije broj iz stringa:
+Kod numeričkih parametara *Memory*, *Hard Drive Capacity* i *Processor Speed* neophodno je sačuvati samo deo koji se odnosi na brojeve što se vrši pozivom sledeće metode koja kao parametar prima regularni izraz koji izbacuje sve što nije broj iz stringa:
 
 replaceAll("\\D+", "");
 
-
-###Kreiranje skupa podataka za trening
-
-
-Kako bi se kreirao skup podataka koji će se koristiti za trening neophodno je da se pozove metoda koja će vratiti podatke o 100 proizvoda koji su prikupiljeni (opisano u prethodnom poglavlju). Odgovarajućom obradom ovih podataka kreira se jedan [arff fajl] (http://www.cs.waikato.ac.nz/ml/weka/arff.html). Ovaj arff fajl sastoji se od nominalnih podataka porodica proizvoda, operativni sistem i tip procesora, kao i numeričkih podataka o veličini ekrana, memoriji, kapacitetu hard diska, brzini procesora i ceni.
+Kako bi se kreirao skup podataka koji će se koristiti za trening, neophodno je da se pozove metoda koja će vratiti podatke o 100 proizvoda koji su prikupiljeni (opisano u prethodnom poglavlju). Odgovarajućom obradom ovih podataka kreira se jedan [arff fajl] (http://www.cs.waikato.ac.nz/ml/weka/arff.html). Ovaj arff fajl sastoji se od nominalnih podataka porodica proizvoda, operativni sistem i tip procesora, kao i numeričkih podataka o veličini ekrana, memoriji, kapacitetu hard diska, brzini procesora i ceni.
 
 Primer arff fajla:
 
@@ -235,15 +224,15 @@ MacBookPro,MacOSX10.7-Lion,IntelCorei5,13.3,4,500,250,669.99
 Ovaj arff fajl sačuvan je u folderu "data" u okviru samog projekta.
 
 
-###Primena metoda mašinskog učenja
+###Testiranje performansi klasifikatora
 
 
-Korišćena su tri klasifikatora i to **k-Nearest-Neighbours**, **SupportVectorMachines** i **REPTree**. Trening klasifikatora se vrši nad dataset-om kreiranim u prethodnom koraku i za sva tri klasifikatora. Nakon uspešno izvršenog treninga klasifikator treba da bude u stanju da što približnije predvidi cenu proizvoda na osnovu unetog seta parametara.
+Korišćena su tri klasifikatora i to **k-Nearest-Neighbours**, **SupportVectorMachines** i **REPTree**. Trening klasifikatora se vrši nad dataset-om kreiranim u prethodnom koraku. Nakon uspešno izvršenog treninga, klasifikator treba da bude u stanju da što približnije predvidi cenu proizvoda na osnovu unetog seta parametara.
 
 
 ##Tehnička realizacija
 
-Sledi opis biblioteka koje su korišćene u realizaciji samog projekta. Kod je realizovan u programskom jeziku **Java**. Referencirane biblioteke koje su korišćene u ovom projektu su **Weka** i **LibSVM**. 
+Kod je realizovan u programskom jeziku **Java**. Referencirane biblioteke koje su korišćene u ovom projektu su **Weka** i **LibSVM**. 
 
 
 ###Weka
