@@ -41,7 +41,7 @@ Kako bi se uopšte mogao izvršiti upit putem eBay API-ja, neophodno je prethodn
 
 Više o tome kako se dobijaju brojevi kategorije može se pogledati na [GetCategoryInfo] (http://developer.ebay.com/devzone/shopping/docs/callref/GetCategoryInfo.html).  
 
-Podrazumevani format u kojem eBay API vraća podatke je XML, tako da nije potrebno posebno naglasiti prilikom slanja zahteva da je ovo format u kojem će podaci biti vraćeni. Kako se u navedenom slučaju dobijaju podaci o 500 zapisa, neophodno je iterirati kroz XML stablo i prikupiti podatke o proizvodima koji su potrebni za dalju realizaciju aplikacije. To je isključivo parametar *ItemID* koji će kasnije poslužiti da se dobiju detaljniji podaci o proizvodu.
+Podrazumevani format u kojem eBay API vraća podatke je XML, tako da nije potrebno posebno naglasiti prilikom slanja zahteva da je ovo format u kojem će podaci biti vraćeni. Kako se u navedenom slučaju dobijaju podaci o 500 zapisa (5 strana sa po 100 zapisa), neophodno je iterirati kroz XML stablo i prikupiti podatke o proizvodima koji su potrebni za dalju realizaciju aplikacije. To je isključivo parametar *ItemID* koji će kasnije poslužiti da se dobiju detaljniji podaci o proizvodu.
 
 Sledi primer dela XML odgovora:
 
@@ -206,9 +206,9 @@ Primer arff fajla:
 ```
 @relation applelaptops 
 
-@attribute productFamily {MacBookPro,MacBook,MacBookAir,MacBookProwithRetinadisplay}
-@attribute operatingSystem {MacOSX10.10-Yosemite,MacOSX10.7-Lion,MacOSX10.6-SnowLeopard,MacOSX10,10.10,AppleMacOSX10.7,MacOSX,MacOSX10.9-Mavericks,MacOSX10.8-MountainLion,AppleMacOSX10.5,MacOSX10.5-Leopard,AppleMacOSX10.10-Yosemite,MacOSXYosemite,AllCurrentOS10.10.4oraskIcanloadolderOS,AppleMacOS,MacOSX10.9}
-@attribute processorType {IntelCorei52ndGen.,IntelCorei5,IntelCore2Duo,IntelCorei54thGen.,Intel,IntelCorei72ndGen.,Corei7,Quad-coreIntelCorei7,IntelCorei74thGen.,IntelCorei75thGen.,I7,IntelCorei55thGen.,IntelCorei7,IntelCorei71stGen.,IntelQuadCorei7,IntelCorei73rdGen.,IntelDualCore}
+@attribute productFamily {MacBookPro,MacBook,MacBookAir,Macbook}
+@attribute operatingSystem {MacOSX10.7-Lion,MacOSX10.6-SnowLeopard,MacOSX10,MacOSX,MacOSX10.5-Leopard,MacOSX10.10-Yosemite,AppleMacOSX10.7,AppleMacOSX10.5,OSX:10.10.5,AppleMacOSX10.6,MacOSX10.4-Tiger,MacOSXYosemite,MacOSX10.10-4Yosemite,MacOSX10.9-Mavericks,AppleMacOSX10.4,MacOSX10.10.3-Yosemite,YOSEMITE10.10,MacOSXYOSEMITE10.10.3JUNE2015iLifeiWork,MacOSX10.8-MountainLion,AppleMacOSX,MacOSX10.9.4-Mavericks,OSX10.9.5,MacOSX10.10,AppleMacOSXMavericks,MacOSX10.10-3Yosemite,MacOSX10.9.5,Yosemite,OSXYosemite,MacOSYosemite,MacOSXYosemite10.10.4(TheLatest2015,OSX10.5,MacOSX10.9orOSX10.8,10.10.5,Silver,MacOSX10.7.5,MacOSX10.10Yosemite,OSX10.10Yosemite,MacOSX10.9.1,MacOSX10.9,osx,NotIncluded,MacOSX10.10.4-Yosemite,MacOSX10.6.3,MACOSX10.10.4Yosemite,MACOSX10.10.3YOSEMITE,MacOSX10.10.4Yosemite,Leopard}
+@attribute processorType {IntelCorei5,IntelCore2Duo,Intel,IntelCorei72ndGen.,IntelCorei75thGen.,IntelCorei71stGen.,IntelCorei7,IntelCorei54thGen.,IntelCorei55thGen.,INTELCOREI7,IntelDualCorei7,IntelCoreI-54260U,IntelCorei51stGen.,IntelQuadCorei7,IntelCorei74thGen.,IntelCoreDuo,IntelCorei73rdGen.,IntelCorei52ndGen.,Core2Duo,IntelCorei53rdGen.,IntelQuad-Corei7,IntelCorei33rdGen.,IntelCoreM,IntelDualCore,IntelCorei7-3615QM,Corei7,IntelCorei54thGen,INTELCOREI5,Inteli7,inteli5processorwithboostspeedTechnology,IntelDual-Corei7,I7,500GB,IntelCorei5.,QUADCORE,I5,Corei5,IntelDual-Corei5,corei7,INTELCORE5,i5}
 @attribute screenSize NUMERIC
 @attribute memory NUMERIC
 @attribute hardDriveCapacity NUMERIC
@@ -217,9 +217,10 @@ Primer arff fajla:
 
 @data
 
-MacBookPro,MacOSX10.10-Yosemite,IntelCorei52ndGen.,13,4,320,230,380.0
-
 MacBookPro,MacOSX10.7-Lion,IntelCorei5,13.3,4,500,250,669.99
+
+MacBook,MacOSX10.6-SnowLeopard,IntelCore2Duo,13.3,2,250,226,259.99
+
 ...
 ```
 
@@ -229,7 +230,7 @@ Ovaj arff fajl sačuvan je u folderu "data" u okviru samog projekta. Nakon kreir
 ###Testiranje performansi klasifikatora
 
 
-Korišćena su četiri klasifikatora i to **k-Nearest-Neighbours**, **SupportVectorMachines**, **REPTree** i **NaiveBayea**. Trening klasifikatora se vrši nad dataset-om kreiranim u prethodnom koraku. Nakon uspešno izvršenog treninga, klasifikator treba da bude u stanju da što približnije predvidi cenu proizvoda na osnovu unetog seta parametara.
+Korišćena su četiri klasifikatora i to **k-Nearest-Neighbours**, **SupportVectorMachines**, **REPTree** i **NaiveBayes**. Trening klasifikatora se vrši nad dataset-om kreiranim u prethodnom koraku. Nakon uspešno izvršenog treninga, klasifikator treba da bude u stanju da što približnije predvidi cenu proizvoda na osnovu unetog seta parametara.
 
 
 ##Tehnička realizacija
