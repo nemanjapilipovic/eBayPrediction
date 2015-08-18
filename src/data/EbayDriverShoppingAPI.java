@@ -107,6 +107,7 @@ public class EbayDriverShoppingAPI extends EbayDriver {
 				if (name.equals("Screen Size")) {
 					screenSize = value;
 					screenSize = screenSize.replace("\"", "");
+					screenSize = screenSize.replaceAll("'", "");
 				}
 				if (name.equals("Processor Type")) {
 					processorType = value;

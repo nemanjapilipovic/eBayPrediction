@@ -4,7 +4,7 @@
 
 [eBay] (https://ebay.com/) je online aukcijski sajt i jedan od najpopularnijih sajtova na Internetu. Ima više miliona ponuda i više miliona korisnika koji se nadmeću i postavljaju (određuju) cene proizvoda. eBay, takođe, ima i besplatan XML-zasnovan [API] (https://go.developer.ebay.com/what-ebay-api) koji je moguće koristiti kako bi se izvršile razne pretrage, kako bi se dobili detaljni podaci o nekom proizvodu ili kako bi se neki proizvod postavio na sajt.
 
-Osnovna ideja ovog projekta je kreiranje aplikacije koja će na osnovu prikupljenih podataka o proizvodima iz kategorije "Apple Laptops" predviđati cenu proizvoda na osnovu podataka o proizvodu. Za trening aplikacije koriste se tri klasifikatora, a to su: k-Nearest-Neighbours, REPTree i Support Vector Machine (SVM). U sekciji Analiza date su performanse svih testiranih klasifikatora i zaključci o njihovim performansama.
+Osnovna ideja ovog projekta je kreiranje aplikacije koja će na osnovu prikupljenih podataka o proizvodima iz kategorije "Apple Laptops" predviđati cenu proizvoda na osnovu podataka o proizvodu. Za trening aplikacije koriste se četiri klasifikatora, a to su: k-Nearest-Neighbours, REPTree, Support Vector Machine (SVM) i NaiveBayes. U sekciji Analiza date su performanse svih testiranih klasifikatora i zaključci o njihovim performansama.
 
 ##Rešenje
 
@@ -25,7 +25,8 @@ Za prikupljanje podataka o proizvodima iz kategorije "Apple Laptops" korišćen 
 public final static String EBAY_FINDING_SERVICE_URI = "http://svcs.ebay.com/services/search/FindingService/v1?OPERATION-NAME="
 			+ "{operation}&SERVICE-VERSION={version}&SECURITY-APPNAME="
 			+ "{applicationId}&GLOBAL-ID={globalId}&categoryId={categoryId}"
-			+ "&paginationInput.entriesPerPage={maxresults}";
+			+ "&paginationInput.entriesPerPage={maxresults}"
+			+ "&paginationInput.pageNumber={pagenumber}";
 ```
 
  - OPERATION-NAME je *findItemsByCategory* s obzirom da se prikupljaju podaci o proizvodima iz određene kateogrije 
@@ -34,12 +35,13 @@ public final static String EBAY_FINDING_SERVICE_URI = "http://svcs.ebay.com/serv
  - GLOBAL-ID je parametar koji predstavlja jedinstveni identifikator za kombinaciju sajta, jezika i teritorije; u ovom slučaju EBAY-US podrazumeva da će se koristiti eBay US sajt
  - CategoryId je postavljen na *111422* što predstavlja broj kategorije koja sadrži Apple laptopove
  - paginationInput.entriesPerPage parametar predstavlja broj rezultata koji će biti vraćeni u jednom pozivu. Postoji ograničenje koje se odnosi na ovaj parametar i podrazumeva da je u jednom pozivu API-ja moguće dobiti podatke o najviše 100 proizvoda
+ - paginationInput.pageNumber parametar predstavlja broj stranice na kojoj se nalaze rezultati pretrage.
  
 Kako bi se uopšte mogao izvršiti upit putem eBay API-ja, neophodno je prethodno registrovati aplikaciju na eBay sajtu koji je namenjen develoeprima. Kao rezultat registrovanja aplikacije na eBay sajtu, dobijaju se parametri koji se koriste prilikom poziva API-ja.
 
 Više o tome kako se dobijaju brojevi kategorije može se pogledati na [GetCategoryInfo] (http://developer.ebay.com/devzone/shopping/docs/callref/GetCategoryInfo.html).  
 
-Podrazumevani format u kojem eBay API vraća podatke je XML, tako da nije potrebno posebno naglasiti prilikom slanja zahteva da je ovo format u kojem će podaci biti vraćeni. Kako se u navedenom slučaju dobijaju podaci o 100 zapisa, neophodno je iterirati kroz XML stablo i prikupiti podatke o proizvodima koji su potrebni za dalju realizaciju aplikacije. To je isključivo parametar *ItemID* koji će kasnije poslužiti da se dobiju detaljniji podaci o proizvodu.
+Podrazumevani format u kojem eBay API vraća podatke je XML, tako da nije potrebno posebno naglasiti prilikom slanja zahteva da je ovo format u kojem će podaci biti vraćeni. Kako se u navedenom slučaju dobijaju podaci o 500 zapisa, neophodno je iterirati kroz XML stablo i prikupiti podatke o proizvodima koji su potrebni za dalju realizaciju aplikacije. To je isključivo parametar *ItemID* koji će kasnije poslužiti da se dobiju detaljniji podaci o proizvodu.
 
 Sledi primer dela XML odgovora:
 
@@ -96,7 +98,7 @@ Sledi primer dela XML odgovora:
 ...
 ```
 
-U cilju dobijanja detaljnijih informacija o proizvodima, na osnovu kojih će se kreirati dataset, neophodno je izvršiti poziv ka [eBay Shopping API-ju] (http://developer.ebay.com/devzone/shopping/docs/CallRef/index.html). Ovde će se iskoristiti podaci o ItemID-jevima proizvoda koji su prikupljeni prilikom poziva eBay Finding API-ja. S obzirom da se u tom pozivu dobijaju podaci o 100 proizvoda, potrebno je izvršiti 100 poziva ka eBay Shopping API-ju. U ovom slučaju link kojim se vrši poziv eBay Shopping API-ja je u programu prikazan sledećim stringom:
+U cilju dobijanja detaljnijih informacija o proizvodima, na osnovu kojih će se kreirati dataset, neophodno je izvršiti poziv ka [eBay Shopping API-ju] (http://developer.ebay.com/devzone/shopping/docs/CallRef/index.html). Ovde će se iskoristiti podaci o ItemID-jevima proizvoda koji su prikupljeni prilikom pet poziva eBay Finding API-ja. S obzirom da se u tim pozivima dobijaju podaci o 500 proizvoda, potrebno je izvršiti 500 poziva ka eBay Shopping API-ju. U ovom slučaju link kojim se vrši poziv eBay Shopping API-ja je u programu prikazan sledećim stringom:
 
 ```
 public final static String EBAY_FINDING_SERVICE_URI = "http://open.api.ebay.com/Shopping?callname="
@@ -111,7 +113,7 @@ public final static String EBAY_FINDING_SERVICE_URI = "http://open.api.ebay.com/
  - appid je isti kao i u prethodnom primeru
  - version predstavlja verziju API-ja koju aplikacija podržava
  - siteid je *0* što predstavlja identifikator US sajta
- - ItemID je vrednost koja će biti promenjena u svih 100 poziva API-ju kako bi se dobili podaci o 100 različitih proizvoda
+ - ItemID je vrednost koja će biti promenjena u svih 500 poziva API-ju kako bi se dobili podaci o 500 različitih proizvoda
  - IncludeSelector=Description, ItemSpecifics podrazumeva da je potebno u odgovoru dobiti najdetaljnije podatke o opisu proizvoda
 
 Kao i u prethodnom slučaju, podrazumevani format u kojem API vraća podatke je XML. Neophodno je proći kroz XML stablo i izvući sve podatke koji su neophodni za kreiranje dataset-a.
@@ -197,7 +199,7 @@ Kod numeričkih parametara *Memory*, *Hard Drive Capacity* i *Processor Speed* n
 
 replaceAll("\\D+", "");
 
-Kako bi se kreirao skup podataka koji će se koristiti za trening, neophodno je da se pozove metoda koja će vratiti podatke o 100 proizvoda koji su prikupiljeni (opisano u prethodnom poglavlju). Odgovarajućom obradom ovih podataka kreira se jedan [arff fajl] (http://www.cs.waikato.ac.nz/ml/weka/arff.html). Ovaj arff fajl sastoji se od nominalnih podataka porodica proizvoda, operativni sistem i tip procesora, kao i numeričkih podataka o veličini ekrana, memoriji, kapacitetu hard diska, brzini procesora i ceni.
+Kako bi se kreirao skup podataka koji će se koristiti za trening, neophodno je da se pozove metoda koja će vratiti podatke o 500 proizvoda koji su prikupiljeni (opisano u prethodnom poglavlju). Odgovarajućom obradom ovih podataka kreira se jedan [arff fajl] (http://www.cs.waikato.ac.nz/ml/weka/arff.html). Ovaj arff fajl sastoji se od nominalnih podataka porodica proizvoda, operativni sistem i tip procesora, kao i numeričkih podataka o veličini ekrana, memoriji, kapacitetu hard diska, brzini procesora i ceni.
 
 Primer arff fajla:
 
@@ -221,13 +223,13 @@ MacBookPro,MacOSX10.7-Lion,IntelCorei5,13.3,4,500,250,669.99
 ...
 ```
 
-Ovaj arff fajl sačuvan je u folderu "data" u okviru samog projekta.
+Ovaj arff fajl sačuvan je u folderu "data" u okviru samog projekta. Nakon kreiranja ovog fajla izvršena je podela na dva nova fajla, a to su training.arff, koji se sastoji od 400 instanci koje služe za trening klasifikora i test.arff koji se sastoji od 100 instanci koje se koriste za testiranje klasifikatora.
 
 
 ###Testiranje performansi klasifikatora
 
 
-Korišćena su tri klasifikatora i to **k-Nearest-Neighbours**, **SupportVectorMachines** i **REPTree**. Trening klasifikatora se vrši nad dataset-om kreiranim u prethodnom koraku. Nakon uspešno izvršenog treninga, klasifikator treba da bude u stanju da što približnije predvidi cenu proizvoda na osnovu unetog seta parametara.
+Korišćena su četiri klasifikatora i to **k-Nearest-Neighbours**, **SupportVectorMachines**, **REPTree** i **NaiveBayea**. Trening klasifikatora se vrši nad dataset-om kreiranim u prethodnom koraku. Nakon uspešno izvršenog treninga, klasifikator treba da bude u stanju da što približnije predvidi cenu proizvoda na osnovu unetog seta parametara.
 
 
 ##Tehnička realizacija
@@ -252,16 +254,17 @@ Nakon izvršenog treninga moguće je pozvati klasifikator da predvidi cenu proiz
 
 ##Analiza
 
-Sledi tabela u kojoj su dati podaci o koeficijentu korelacije i srednjoj apsolutnoj greški za sva tri klasifikatora.
+Sledi tabela u kojoj su dati podaci o koeficijentu korelacije i srednjoj apsolutnoj greški za sva četiri klasifikatora.
 
 |Klasifikator|Koeficijent korelacije|Srednja apsolutna greška|
 |------------|----------------------|------------------------|
-|kNearestNeighbours|0,8691|137,9989|
-|Support Vector Machine|0,0941|334,6157|
-|REPTree|0,8466|170,5975|
+|kNearestNeighbours|0,8493|124,0697|
+|Support Vector Machine|0,3793|341,2433|
+|REPTree|0,8053|182,5728|
+|NaiveBayes|-0,4931|744,3484|
 
 U cilju ocenjivanja određenog klasifikatora i upoređivanja sa nekim drugim klasifikatorom potrebno je da apsolutna vrednost koeficijenta korelacije bude što veća, odnosno da srednja apsolutna greška bude što manja. Generalno, koeficijent korelacije ocenjuje "jačinu" statističke veze između dve ili više promenljivih. S druge strane, srednja apsolutna greška je vrednost koja se koristi kako bi se izmerilo koliko su predviđanja približna mogućim ishodima.
 
-Primetno je da je vrednost koeficijenta korelacije dosta mala, odnosno da je vrednost srednje apsolutne greške dosta velika kada se koristi Support Vector Machine klasifikator. Što se tiče koeficijenta korelacije kod klasifikatora kNearestNeighbours i REPTree - oni imaju približne vrednosti, dok je srednja apsolutna greška ipak značajno manja kod klasifikatora kNearestNeighbours.
+Primetno je da je vrednost koeficijenta korelacije dosta mala, odnosno da je vrednost srednje apsolutne greške dosta velika kada se koristi Support Vector Machine klasifikator. Što se tiče koeficijenta korelacije kod klasifikatora k-Nearest-Neighbours i REPTree - oni imaju približne vrednosti, dok je srednja apsolutna greška ipak značajno manja kod klasifikatora kNearestNeighbours. S obzirom da je srednja apsolutna greška kod NaiveBayes klasifikatora jako velika njega cemo odmah odbaciti.
 
-U skladu sa dobijenim podacima zaključuje se da je najbolje koristiti klasifikator kNearestNeighbours, uz napomenu da i REPTree klasifikator ima dosta dobre performanse.
+U skladu sa dobijenim podacima zaključuje se da je najbolje koristiti klasifikator k-Nearest-Neighbours, uz napomenu da i REPTree klasifikator ima dosta dobre performanse.

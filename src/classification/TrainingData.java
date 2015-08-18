@@ -18,7 +18,7 @@ public class TrainingData {
 	Instances data;
 
 	public void loadData() throws Exception {
-		DataSource loader = new DataSource("data/applelaptops.arff");
+		DataSource loader = new DataSource("data/training.arff");
 		data = loader.getDataSet();
 		data.setClassIndex(data.numAttributes() - 1);
 	}
@@ -62,14 +62,14 @@ public class TrainingData {
 		System.out.println(eval.toSummaryString());
 
 	}
-/*	
+	
 	public void naiveBayes() throws Exception {
 
 		Discretize discretizeFilter = new Discretize();
 		discretizeFilter.setAttributeIndices("4,5,6,7,8");
 		discretizeFilter.setInputFormat(data);
 		discretizeFilter.setBins(10);
-		// podela se vrsi tako da svaki interval ima priblizno jednak broj instanci
+		discretizeFilter.setOptions(new String[]{"-unset-class-temporarily"});
 		discretizeFilter.setUseEqualFrequency(true);
 		
 		NaiveBayes nbClassifier = new NaiveBayes();
@@ -79,14 +79,9 @@ public class TrainingData {
 		filteredClassifier.buildClassifier(data);
 		
 		Evaluation eval = new Evaluation(data);
-		// klasifikator se evaluaira kroz kros-validaciju sa 10 iteracija (10-fold cross-validation)
 		eval.crossValidateModel(filteredClassifier, data, 10, new Random(1));
-		//prikazujemo rezultate evaluacije klasifikatora
 		System.out.println(eval.toSummaryString()); 
-		System.out.println(eval.toClassDetailsString());
-		System.out.println(eval.toMatrixString());
-
 
 	}
-*/
+
 }

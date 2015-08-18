@@ -1,6 +1,7 @@
 package main;
 
 import classification.TrainingData;
+import data.EbayDriverFindingAPI;
 import data_processing.PrepareData;
 
 public class Main {
@@ -15,6 +16,7 @@ public class Main {
 		td.kNearestNeighbours();
 		td.repTree();
 		td.supportVectorMachine();
+		td.naiveBayes();
 		
 		
 

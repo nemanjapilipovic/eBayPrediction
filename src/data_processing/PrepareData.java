@@ -3,7 +3,11 @@ package data_processing;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.LinkedList;
+import java.util.Random;
 
+import weka.core.Instances;
+import weka.core.converters.ArffSaver;
+import weka.core.converters.ConverterUtils.DataSource;
 import data.EbayDriverShoppingAPI;
 
 public class PrepareData {
@@ -20,7 +24,7 @@ public class PrepareData {
 		LinkedList<String> operatingSystem = new LinkedList<String>();
 		LinkedList<String> processorType = new LinkedList<String>();
 
-		File dataFile = new File("data/applelaptops.arff");
+		File dataFile = new File("data/dataset.arff");
 		FileWriter writer = null;
 		writer = new FileWriter(dataFile);
 		writer.write("@relation applelaptops \n\n");
@@ -85,7 +89,30 @@ public class PrepareData {
 		}
 
 		writer.close();
+		
+		createTrainingAndTestFiles();
 
+	}
+
+	public void createTrainingAndTestFiles() throws Exception {
+		DataSource loader = new DataSource("data/dataset.arff");
+		Instances data = loader.getDataSet();
+
+		data.randomize(new Random());
+		int trainSize = data.numInstances() * 80 / 100;
+		int testSize = data.numInstances() - trainSize;
+		Instances train = new Instances(data, 0, trainSize);
+		Instances test = new Instances(data, trainSize, testSize);
+
+		ArffSaver saverTrain = new ArffSaver();
+		saverTrain.setInstances(train);
+		saverTrain.setFile(new File("data/training.arff"));
+		saverTrain.writeBatch();
+		
+		ArffSaver saverTest = new ArffSaver();
+		saverTest.setInstances(test);
+		saverTest.setFile(new File("data/test.arff"));
+		saverTest.writeBatch();
 	}
 
 }
