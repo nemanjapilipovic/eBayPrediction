@@ -117,10 +117,15 @@ public class EbayDriverShoppingAPI extends EbayDriver {
 					operatingSystem = value;
 					operatingSystem = operatingSystem.replace(",", "-");
 					operatingSystem = operatingSystem.replaceAll(" ", "");
+					operatingSystem = operatingSystem.replaceAll("\"", "");
 
 				}
 				if (name.equals("Memory")) {
 					memory = value;
+					if (memory.length() > 5) {
+						String[] mem = memory.split(" ");
+						memory = mem[0];
+					}
 					memory = memory.replaceAll("\\D+", "");
 				}
 				if (name.equals("Hard Drive Capacity")) {

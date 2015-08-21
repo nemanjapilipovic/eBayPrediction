@@ -259,10 +259,10 @@ Sledi tabela u kojoj su dati podaci o koeficijentu korelacije i srednjoj apsolut
 
 |Klasifikator|Koeficijent korelacije|Srednja apsolutna greška|
 |------------|----------------------|------------------------|
-|kNearestNeighbours|0,8493|124,0697|
-|Support Vector Machine|0,3793|341,2433|
-|REPTree|0,8053|182,5728|
-|NaiveBayes|-0,4931|744,3484|
+|kNearestNeighbours|0,835|153,4495|
+|Support Vector Machine|0,1986|378,2386|
+|REPTree|0,8184|188,4388|
+|NaiveBayes|-0,4544|779,9105|
 
 U cilju ocenjivanja određenog klasifikatora i upoređivanja sa nekim drugim klasifikatorom potrebno je da apsolutna vrednost koeficijenta korelacije bude što veća, odnosno da srednja apsolutna greška bude što manja. Generalno, koeficijent korelacije ocenjuje "jačinu" statističke veze između dve ili više promenljivih. S druge strane, srednja apsolutna greška je vrednost koja se koristi kako bi se izmerilo koliko su predviđanja približna mogućim ishodima.
 
